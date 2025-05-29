@@ -1,0 +1,900 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>博物馆智慧管理系统 MVP</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .main-nav {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .nav-btn {
+            padding: 12px 24px;
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .nav-btn:hover,
+        .nav-btn.active {
+            background: rgba(255,255,255,0.3);
+            border-color: white;
+            transform: translateY(-2px);
+        }
+
+        .content-area {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            backdrop-filter: blur(20px);
+            min-height: 600px;
+        }
+
+        .section {
+            display: none;
+        }
+
+        .section.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .section h2 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 1.8rem;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 10px;
+        }
+
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+        }
+
+        .card h3 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 1.3rem;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: #555;
+            font-weight: 500;
+        }
+
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+            color: #333;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .data-table th,
+        .data-table td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid #e1e5e9;
+        }
+
+        .data-table th {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            font-weight: 500;
+        }
+
+        .data-table tr:hover {
+            background: #f8f9fa;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #84fab0 0%, #8fd3f4 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+        }
+
+        .stat-card h3 {
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+
+        .stat-card p {
+            opacity: 0.9;
+        }
+
+        .qr-scanner {
+            background: #f8f9fa;
+            border: 2px dashed #dee2e6;
+            border-radius: 10px;
+            padding: 40px;
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .qr-scanner:hover {
+            border-color: #667eea;
+            background: #f0f4ff;
+        }
+
+        .device-status {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .status-online {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-offline {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .status-warning {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .main-nav {
+                gap: 10px;
+            }
+            
+            .nav-btn {
+                padding: 8px 16px;
+                font-size: 14px;
+            }
+            
+            .content-area {
+                padding: 20px;
+            }
+            
+            .card-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🏛️ 博物馆智慧管理系统</h1>
+            <p>Museum Smart Management System - MVP版本</p>
+        </div>
+
+        <div class="main-nav">
+            <button class="nav-btn active" onclick="showSection('overview')">总览</button>
+            <button class="nav-btn" onclick="showSection('artifacts')">文物管理</button>
+            <button class="nav-btn" onclick="showSection('devices')">设备监控</button>
+            <button class="nav-btn" onclick="showSection('activities')">活动管理</button>
+            <button class="nav-btn" onclick="showSection('visitor')">观众服务</button>
+        </div>
+
+        <div class="content-area">
+            <!-- 总览页面 -->
+            <div id="overview" class="section active">
+                <h2>📊 数据总览</h2>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <h3 id="totalArtifacts">156</h3>
+                        <p>文物总数</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3 id="onlineDevices">12</h3>
+                        <p>在线设备</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3 id="todayVisitors">89</h3>
+                        <p>今日访客</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3 id="activeEvents">3</h3>
+                        <p>进行中活动</p>
+                    </div>
+                </div>
+
+                <div class="card-grid">
+                    <div class="card">
+                        <h3>🏺 热门文物</h3>
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>文物名称</th>
+                                    <th>浏览次数</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr><td>唐三彩马俑</td><td>245</td></tr>
+                                <tr><td>青花瓷瓶</td><td>198</td></tr>
+                                <tr><td>汉代铜镜</td><td>167</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="card">
+                        <h3>⚠️ 设备告警</h3>
+                        <div id="deviceAlerts">
+                            <p style="color: #28a745;">✅ 所有设备运行正常</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 文物管理页面 -->
+            <div id="artifacts" class="section">
+                <h2>🏺 文物管理</h2>
+                <div class="card-grid">
+                    <div class="card">
+                        <h3>📝 添加文物</h3>
+                        <form id="artifactForm">
+                            <div class="form-group">
+                                <label>文物编号</label>
+                                <input type="text" id="artifactId" placeholder="例：BM2024001" required>
+                            </div>
+                            <div class="form-group">
+                                <label>文物名称</label>
+                                <input type="text" id="artifactName" placeholder="例：唐三彩马俑" required>
+                            </div>
+                            <div class="form-group">
+                                <label>年代</label>
+                                <input type="text" id="artifactPeriod" placeholder="例：唐代">
+                            </div>
+                            <div class="form-group">
+                                <label>展厅位置</label>
+                                <select id="artifactLocation">
+                                    <option value="">请选择展厅</option>
+                                    <option value="ancient">古代文明厅</option>
+                                    <option value="ceramic">陶瓷艺术厅</option>
+                                    <option value="bronze">青铜器厅</option>
+                                    <option value="calligraphy">字画厅</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>描述</label>
+                                <textarea id="artifactDesc" rows="3" placeholder="文物详细描述..."></textarea>
+                            </div>
+                            <button type="submit" class="btn">添加文物</button>
+                        </form>
+                    </div>
+                    <div class="card">
+                        <h3>🔍 文物搜索</h3>
+                        <div class="form-group">
+                            <input type="text" id="searchInput" placeholder="搜索文物名称或编号..." onkeyup="searchArtifacts()">
+                        </div>
+                        <div class="qr-scanner" onclick="simulateQRScan()">
+                            <p>📱 点击扫描二维码<br>快速查找文物信息</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3>📋 文物列表</h3>
+                    <table class="data-table" id="artifactsTable">
+                        <thead>
+                            <tr>
+                                <th>编号</th>
+                                <th>名称</th>
+                                <th>年代</th>
+                                <th>位置</th>
+                                <th>状态</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="artifactsTableBody">
+                            <!-- 动态加载内容 -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- 设备监控页面 -->
+            <div id="devices" class="section">
+                <h2>📡 设备监控</h2>
+                <div class="card-grid">
+                    <div class="card">
+                        <h3>🌡️ 环境监控</h3>
+                        <div class="stats-grid">
+                            <div class="stat-card">
+                                <h3 id="temperature">23°C</h3>
+                                <p>温度</p>
+                            </div>
+                            <div class="stat-card">
+                                <h3 id="humidity">45%</h3>
+                                <p>湿度</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <h3>👥 人流监控</h3>
+                        <div class="stats-grid">
+                            <div class="stat-card">
+                                <h3 id="currentVisitors">23</h3>
+                                <p>当前在馆人数</p>
+                            </div>
+                            <div class="stat-card">
+                                <h3 id="peakTime">14:30</h3>
+                                <p>今日高峰时段</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3>🔧 设备状态</h3>
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>设备名称</th>
+                                <th>位置</th>
+                                <th>状态</th>
+                                <th>最后更新</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="devicesTableBody">
+                            <!-- 动态加载内容 -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- 活动管理页面 -->
+            <div id="activities" class="section">
+                <h2>🎉 活动管理</h2>
+                <div class="card-grid">
+                    <div class="card">
+                        <h3>➕ 创建活动</h3>
+                        <form id="activityForm">
+                            <div class="form-group">
+                                <label>活动名称</label>
+                                <input type="text" id="activityName" placeholder="例：文物知识竞赛" required>
+                            </div>
+                            <div class="form-group">
+                                <label>活动时间</label>
+                                <input type="datetime-local" id="activityTime" required>
+                            </div>
+                            <div class="form-group">
+                                <label>目标人群</label>
+                                <select id="targetAudience">
+                                    <option value="all">所有观众</option>
+                                    <option value="students">学生群体</option>
+                                    <option value="adults">成人观众</option>
+                                    <option value="seniors">老年观众</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>活动描述</label>
+                                <textarea id="activityDesc" rows="3" placeholder="活动详细介绍..."></textarea>
+                            </div>
+                            <button type="submit" class="btn">创建活动</button>
+                        </form>
+                    </div>
+                    <div class="card">
+                        <h3>📈 活动统计</h3>
+                        <div class="stats-grid">
+                            <div class="stat-card">
+                                <h3 id="totalActivities">12</h3>
+                                <p>总活动数</p>
+                            </div>
+                            <div class="stat-card">
+                                <h3 id="activeParticipants">156</h3>
+                                <p>活跃参与者</p>
+                            </div>
+                        </div>
+                        <button class="btn btn-secondary" onclick="sendNotification()">📱 推送活动通知</button>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3>📅 活动列表</h3>
+                    <table class="data-table" id="activitiesTable">
+                        <thead>
+                            <tr>
+                                <th>活动名称</th>
+                                <th>时间</th>
+                                <th>状态</th>
+                                <th>参与人数</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="activitiesTableBody">
+                            <!-- 动态加载内容 -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- 观众服务页面 -->
+            <div id="visitor" class="section">
+                <h2>👥 观众服务</h2>
+                <div class="card-grid">
+                    <div class="card">
+                        <h3>🗺️ 智能导览</h3>
+                        <div class="qr-scanner" onclick="startNavigation()">
+                            <p>🧭 点击开始智能导览<br>为观众提供最佳参观路线</p>
+                        </div>
+                        <div class="form-group">
+                            <label>推荐路线</label>
+                            <select id="recommendedRoute">
+                                <option value="classic">经典文物路线 (45分钟)</option>
+                                <option value="family">亲子互动路线 (30分钟)</option>
+                                <option value="scholar">学者深度路线 (90分钟)</option>
+                            </select>
+                        </div>
+                        <button class="btn">生成导览方案</button>
+                    </div>
+                    <div class="card">
+                        <h3>🤖 AI问答助手</h3>
+                        <div id="chatArea" style="height: 200px; overflow-y: auto; border: 1px solid #e1e5e9; border-radius: 8px; padding: 10px; margin-bottom: 10px; background: #f8f9fa;">
+                            <div style="margin-bottom: 10px;">
+                                <strong>AI助手:</strong> 您好！我是博物馆智能导览助手，有什么可以帮助您的吗？
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <input type="text" id="userQuestion" placeholder="输入您的问题..." onkeypress="handleEnterKey(event)">
+                        </div>
+                        <button class="btn" onclick="askAI()">🎤 语音提问</button>
+                        <button class="btn btn-secondary" onclick="sendQuestion()">💬 发送问题</button>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3>📱 互动功能</h3>
+                    <div class="card-grid">
+                        <div class="card">
+                            <h3>📸 电子明信片</h3>
+                            <p>观众可以创建个性化明信片，分享参观体验</p>
+                            <button class="btn" onclick="createPostcard()">创建明信片</button>
+                        </div>
+                        <div class="card">
+                            <h3>💬 社区分享</h3>
+                            <p>参观心得分享平台，增进文化交流</p>
+                            <button class="btn btn-secondary" onclick="viewCommunity()">查看社区</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 模拟数据
+        let artifacts = [
+            { id: 'BM2024001', name: '唐三彩马俑', period: '唐代', location: '古代文明厅', status: '展出中' },
+            { id: 'BM2024002', name: '青花瓷瓶', period: '明代', location: '陶瓷艺术厅', status: '展出中' },
+            { id: 'BM2024003', name: '汉代铜镜', period: '汉代', location: '青铜器厅', status: '维护中' },
+            { id: 'BM2024004', name: '宋代字画', period: '宋代', location: '字画厅', status: '展出中' }
+        ];
+
+        let devices = [
+            { name: '温湿度传感器-1', location: '古代文明厅', status: 'online', lastUpdate: '2分钟前' },
+            { name: '人流计数器-A', location: '入口大厅', status: 'online', lastUpdate: '1分钟前' },
+            { name: '安防摄像头-3', location: '陶瓷艺术厅', status: 'warning', lastUpdate: '5分钟前' },
+            { name: '照明系统-B', location: '青铜器厅', status: 'online', lastUpdate: '3分钟前' }
+        ];
+
+        let activities = [
+            { name: '文物知识竞赛', time: '2024-06-15 14:00', status: '进行中', participants: 45 },
+            { name: '古代文明讲座', time: '2024-06-20 10:00', status: '即将开始', participants: 23 },
+            { name: '亲子互动体验', time: '2024-06-10 15:30', status: '已结束', participants: 67 }
+        ];
+
+        // 页面切换功能
+        function showSection(sectionId) {
+            // 隐藏所有section
+            document.querySelectorAll('.section').forEach(section => {
+                section.classList.remove('active');
+            });
+            
+            // 移除所有导航按钮的active状态
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            // 显示目标section
+            document.getElementById(sectionId).classList.add('active');
+            
+            // 设置对应导航按钮为active
+            event.target.classList.add('active');
+            
+            // 加载对应数据
+            loadSectionData(sectionId);
+        }
+
+        // 加载各section数据
+        function loadSectionData(sectionId) {
+            switch(sectionId) {
+                case 'artifacts':
+                    loadArtifactsTable();
+                    break;
+                case 'devices':
+                    loadDevicesTable();
+                    updateEnvironmentData();
+                    break;
+                case 'activities':
+                    loadActivitiesTable();
+                    break;
+            }
+        }
+
+        // 加载文物表格
+        function loadArtifactsTable() {
+            const tbody = document.getElementById('artifactsTableBody');
+            tbody.innerHTML = artifacts.map(artifact => `
+                <tr>
+                    <td>${artifact.id}</td>
+                    <td>${artifact.name}</td>
+                    <td>${artifact.period}</td>
+                    <td>${artifact.location}</td>
+                    <td><span class="device-status ${artifact.status === '展出中' ? 'status-online' : 'status-warning'}">${artifact.status}</span></td>
+                    <td>
+                        <button class="btn" style="padding: 5px 10px; font-size: 12px;" onclick="editArtifact('${artifact.id}')">编辑</button>
+                        <button class="btn btn-secondary" style="padding: 5px 10px; font-size: 12px;" onclick="viewArtifact('${artifact.id}')">查看</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        // 模拟二维码扫描
+        function simulateQRScan() {
+            const randomArtifact = artifacts[Math.floor(Math.random() * artifacts.length)];
+            alert(`扫描成功！\n文物信息：\n编号：${randomArtifact.id}\n名称：${randomArtifact.name}\n年代：${randomArtifact.period}\n位置：${randomArtifact.location}`);
+        }
+
+        // 更新环境数据
+        function updateEnvironmentData() {
+            // 模拟实时数据更新
+            setInterval(() => {
+                const temp = 20 + Math.random() * 8;
+                const humidity = 40 + Math.random() * 20;
+                const visitors = Math.floor(15 + Math.random() * 20);
+                
+                document.getElementById('temperature').textContent = temp.toFixed(1) + '°C';
+                document.getElementById('humidity').textContent = humidity.toFixed(0) + '%';
+                document.getElementById('currentVisitors').textContent = visitors;
+            }, 5000);
+        }
+
+        // AI问答功能
+        function sendQuestion() {
+            const question = document.getElementById('userQuestion').value;
+            if (!question.trim()) return;
+            
+            const chatArea = document.getElementById('chatArea');
+            
+            // 添加用户问题
+            chatArea.innerHTML += `<div style="margin-bottom: 10px; text-align: right;"><strong>您:</strong> ${question}</div>`;
+            
+            // 模拟AI回答
+            setTimeout(() => {
+                const answers = [
+                    '这件文物来自唐代，是当时丝绸之路贸易的重要见证。',
+                    '建议您参观古代文明厅的青铜器展区，那里有很多精美的文物。',
+                    '我们的开放时间是周二至周日 9:00-17:00，周一闭馆。',
+                    '这个展品使用了当时最先进的工艺技术，具有很高的艺术价值。',
+                    '您可以在我们的多媒体区观看更详细的介绍视频。'
+                ];
+                const randomAnswer = answers[Math.floor(Math.random() * answers.length)];
+                chatArea.innerHTML += `<div style="margin-bottom: 10px;"><strong>AI助手:</strong> ${randomAnswer}</div>`;
+                chatArea.scrollTop = chatArea.scrollHeight;
+            }, 1000);
+            
+            document.getElementById('userQuestion').value = '';
+        }
+
+        // 处理回车键
+        function handleEnterKey(event) {
+            if (event.key === 'Enter') {
+                sendQuestion();
+            }
+        }
+
+        // 语音提问（模拟）
+        function askAI() {
+            alert('🎤 语音识别功能已启动\n请说出您的问题...\n\n（在实际应用中，这里会调用语音识别API）');
+            
+            // 模拟语音识别结果
+            setTimeout(() => {
+                document.getElementById('userQuestion').value = '这件青花瓷是什么年代的？';
+                sendQuestion();
+            }, 2000);
+        }
+
+        // 开始导览
+        function startNavigation() {
+            const route = document.getElementById('recommendedRoute').value;
+            let routeInfo = '';
+            
+            switch(route) {
+                case 'classic':
+                    routeInfo = '经典文物路线：\n1. 古代文明厅 - 唐三彩马俑\n2. 陶瓷艺术厅 - 青花瓷瓶\n3. 青铜器厅 - 汉代铜镜\n4. 字画厅 - 宋代字画\n\n预计用时：45分钟';
+                    break;
+                case 'family':
+                    routeInfo = '亲子互动路线：\n1. 互动体验区\n2. 文物知识问答\n3. 手工制作区\n4. 多媒体展示\n\n预计用时：30分钟';
+                    break;
+                case 'scholar':
+                    routeInfo = '学者深度路线：\n1. 详细文物解说\n2. 历史背景介绍\n3. 工艺技术分析\n4. 文化价值探讨\n\n预计用时：90分钟';
+                    break;
+            }
+            
+            alert(`🧭 智能导览已开始！\n\n${routeInfo}\n\n导览将通过语音为您详细介绍每件文物的历史和文化价值。`);
+        }
+
+        // 创建明信片
+        function createPostcard() {
+            alert('📸 电子明信片功能\n\n您可以：\n• 选择喜欢的文物照片\n• 添加个性化文字\n• 分享到社交平台\n• 发送给朋友家人\n\n让美好的参观体验永久保存！');
+        }
+
+        // 查看社区
+        function viewCommunity() {
+            alert('💬 互动社区\n\n热门话题：\n• #我最喜欢的文物\n• #博物馆奇妙之旅\n• #历史文化探索\n\n参与讨论，分享您的参观感受，与其他文化爱好者交流！');
+        }
+
+        // 发送通知
+        function sendNotification() {
+            alert('📱 活动通知已发送！\n\n通知内容：\n• 新活动"文物知识竞赛"即将开始\n• 时间：本周六 14:00\n• 地点：多功能厅\n• 精美奖品等您来拿！\n\n已推送给156位用户');
+        }
+
+        // 编辑和查看功能（模拟）
+        function editArtifact(id) {
+            alert(`编辑文物 ${id}\n（在实际应用中会打开编辑表单）`);
+        }
+
+        function viewArtifact(id) {
+            const artifact = artifacts.find(a => a.id === id);
+            alert(`文物详情：\n编号：${artifact.id}\n名称：${artifact.name}\n年代：${artifact.period}\n位置：${artifact.location}\n状态：${artifact.status}`);
+        }
+
+        function controlDevice(name) {
+            alert(`设备控制：${name}\n（在实际应用中会显示设备控制面板）`);
+        }
+
+        function editActivity(name) {
+            alert(`编辑活动：${name}\n（在实际应用中会打开活动编辑界面）`);
+        }
+
+        // 页面加载时初始化数据
+        document.addEventListener('DOMContentLoaded', function() {
+            loadArtifactsTable();
+            updateEnvironmentData();
+            
+            // 模拟实时数据更新
+            setInterval(() => {
+                const todayVisitors = 80 + Math.floor(Math.random() * 30);
+                document.getElementById('todayVisitors').textContent = todayVisitors;
+                
+                const onlineDevices = 10 + Math.floor(Math.random() * 5);
+                document.getElementById('onlineDevices').textContent = onlineDevices;
+            }, 10000);
+        });
+    </script>
+</body>
+</html>status-online' : 'status-warning'}">${artifact.status}</span></td>
+                    <td>
+                        <button class="btn" style="padding: 5px 10px; font-size: 12px;" onclick="editArtifact('${artifact.id}')">编辑</button>
+                        <button class="btn btn-secondary" style="padding: 5px 10px; font-size: 12px;" onclick="viewArtifact('${artifact.id}')">查看</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        // 加载设备表格
+        function loadDevicesTable() {
+            const tbody = document.getElementById('devicesTableBody');
+            tbody.innerHTML = devices.map(device => `
+                <tr>
+                    <td>${device.name}</td>
+                    <td>${device.location}</td>
+                    <td><span class="device-status status-${device.status}">${device.status === 'online' ? '在线' : device.status === 'offline' ? '离线' : '告警'}</span></td>
+                    <td>${device.lastUpdate}</td>
+                    <td>
+                        <button class="btn" style="padding: 5px 10px; font-size: 12px;" onclick="controlDevice('${device.name}')">控制</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        // 加载活动表格
+        function loadActivitiesTable() {
+            const tbody = document.getElementById('activitiesTableBody');
+            tbody.innerHTML = activities.map(activity => `
+                <tr>
+                    <td>${activity.name}</td>
+                    <td>${activity.time}</td>
+                    <td><span class="device-status ${activity.status === '进行中' ? 'status-online' : activity.status === '即将开始' ? 'status-warning' : 'status-offline'}">${activity.status}</span></td>
+                    <td>${activity.participants}</td>
+                    <td>
+                        <button class="btn" style="padding: 5px 10px; font-size: 12px;" onclick="editActivity('${activity.name}')">编辑</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        // 文物表单提交
+        document.getElementById('artifactForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const newArtifact = {
+                id: document.getElementById('artifactId').value,
+                name: document.getElementById('artifactName').value,
+                period: document.getElementById('artifactPeriod').value,
+                location: document.getElementById('artifactLocation').options[document.getElementById('artifactLocation').selectedIndex].text,
+                status: '展出中'
+            };
+            
+            artifacts.push(newArtifact);
+            loadArtifactsTable();
+            
+            // 更新总览数据
+            document.getElementById('totalArtifacts').textContent = artifacts.length;
+            
+            alert('文物添加成功！');
+            this.reset();
+        });
+
+        // 活动表单提交
+        document.getElementById('activityForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const newActivity = {
+                name: document.getElementById('activityName').value,
+                time: document.getElementById('activityTime').value,
+                status: '即将开始',
+                participants: 0
+            };
+            
+            activities.push(newActivity);
+            loadActivitiesTable();
+            
+            // 更新总览数据
+            document.getElementById('activeEvents').textContent = activities.filter(a => a.status === '进行中').length;
+            
+            alert('活动创建成功！');
+            this.reset();
+        });
+
+        // 搜索功能
+        function searchArtifacts() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const filteredArtifacts = artifacts.filter(artifact => 
+                artifact.name.toLowerCase().includes(searchTerm) || 
+                artifact.id.toLowerCase().includes(searchTerm)
+            );
+            
+            const tbody = document.getElementById('artifactsTableBody');
+            tbody.innerHTML = filteredArtifacts.map(artifact => `
+                <tr>
+                    <td>${artifact.id}</td>
+                    <td>${artifact.name}</td>
+                    <td>${artifact.period}</td>
+                    <td>${artifact.location}</td>
+                    <td><span class="device-status ${artifact.status === '展出中' ? '
